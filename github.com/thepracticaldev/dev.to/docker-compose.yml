@@ -1,0 +1,40 @@
+version: '3'
+services:
+  web: &web
+    build: .
+    command: bin/rails s -b 0.0.0.0 -p 3000
+    environment:
+      BUNDLE_PATH: /vendor/bundle
+      DISABLE_SPRING: 1
+      DATABASE_HOST: postgres
+      DATABASE_USER: app
+      WEBPACKER_DEV_SERVER_HOST: localhost
+      WEBPACKER_DEV_SERVER_PORT: 3001
+    env_file: devto.env
+    volumes:
+      - .:/app:cached
+      - tmp:/app/tmp
+      - home:/home:cached
+      - vendor:/vendor
+    depends_on:
+      - postgres
+    ports:
+      - 3000:3000
+  webpacker:
+    <<: *web
+    command: bin/webpack-dev-server
+    ports:
+      - 3001:3001
+  job:
+    <<: *web
+    command: bin/rake jobs:work
+    ports: []
+  postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: app
+      ? POSTGRES_PASSWORD
+volumes:
+  ? home
+  ? vendor
+  ? tmp

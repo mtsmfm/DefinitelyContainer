@@ -1,0 +1,98 @@
+diff --git a/Gemfile b/Gemfile
+index 1b1e4f3..4659df1 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -90,7 +90,6 @@ gem "staccato", "~> 0.5"
+ gem "storext", "~> 2.2"
+ gem "stream_rails", "~> 2.6"
+ gem "stripe", "~> 3.25"
+-gem "therubyracer", "~> 0.12", platforms: :ruby
+ gem "timber", "~> 2.6"
+ gem "twilio-ruby", "~> 5.10"
+ gem "twitter", "~> 6.2"
+diff --git a/Gemfile.lock b/Gemfile.lock
+index ca65d07..6290799 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -549,7 +549,6 @@ GEM
+       multi_json (~> 1.0)
+     launchy (2.4.3)
+       addressable (~> 2.3)
+-    libv8 (3.16.14.19)
+     liquid (4.0.0)
+     listen (3.1.5)
+       rb-fsevent (~> 0.9, >= 0.9.4)
+@@ -702,7 +701,6 @@ GEM
+     recaptcha (4.12.0)
+       json
+     redcarpet (3.4.0)
+-    ref (2.0.0)
+     representable (3.0.4)
+       declarative (< 0.1.0)
+       declarative-option (< 0.2.0)
+@@ -851,9 +849,6 @@ GEM
+       multi_json (~> 1.0)
+       stripe (>= 2.0.3)
+     test-prof (0.5.0)
+-    therubyracer (0.12.3)
+-      libv8 (~> 3.16.14.15)
+-      ref
+     thor (0.20.0)
+     thread_safe (0.3.6)
+     tilt (2.0.8)
+@@ -1042,7 +1037,6 @@ DEPENDENCIES
+   stripe (~> 3.25)
+   stripe-ruby-mock (~> 2.5)
+   test-prof (~> 0.5)
+-  therubyracer (~> 0.12)
+   timber (~> 2.6)
+   timecop (~> 0.9)
+   twilio-ruby (~> 5.10)
+diff --git a/config/database.yml b/config/database.yml
+index 325afe2..eb41b7c 100644
+--- a/config/database.yml
++++ b/config/database.yml
+@@ -23,8 +23,10 @@ default: &default
+   connect_timeout: 2
+   checkout_timeout: 2
+   variables:
+-      statement_timeout: <%= ENV['STATEMENT_TIMEOUT'] || 2500 %>
+-      
++    statement_timeout: <%= ENV['STATEMENT_TIMEOUT'] || 2500 %>
++  host: <%= ENV.fetch("DATABASE_HOST") %>
++  user: <%= ENV.fetch("DATABASE_USER") %>
++
+ development:
+   <<: *default
+   database: PracticalDeveloper_development
+@@ -34,22 +36,17 @@ development:
+   # When left blank, postgres will use the default role. This is
+   # the same name as the operating system user that initialized the database.
+   #username: PracticalDeveloper
+-
+   # The password associated with the postgres role (username).
+   #password:
+-
+   # Connect on a TCP socket. Omitted by default since the client uses a
+   # domain socket that doesn't need configuration. Windows does not have
+   # domain sockets, so uncomment these lines.
+   #host: localhost
+-
+   # The TCP port the server listens on. Defaults to 5432.
+   # If your server runs on a different port number, change accordingly.
+   #port: 5432
+-
+   # Schema search path. The server defaults to $user,public
+   #schema_search_path: myapp,sharedapp,public
+-
+   # Minimum log levels, in increasing order:
+   #   debug5, debug4, debug3, debug2, debug1,
+   #   log, notice, warning, error, fatal, and panic
+@@ -61,7 +58,6 @@ development:
+ # Do not set this db to the same as development or production.
+ test:
+   <<: *default
+-  host: localhost
+   database: PracticalDeveloper_test<%= ENV['TEST_ENV_NUMBER'] %>
+ 
+ # As with config/secrets.yml, you never want to store sensitive information,
